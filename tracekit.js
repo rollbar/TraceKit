@@ -126,11 +126,8 @@ TraceKit.report = (function reportModuleWrapper() {
      * Dispatch stack information to all handlers.
      * @param {Object.<string, *>} stack
      */
-    function notifyHandlers(stack, windowError) {
+    function notifyHandlers(stack) {
         var exception = null;
-        if (windowError && !TraceKit.collectWindowErrors) {
-          return;
-        }
         for (var i in handlers) {
             if (_has(handlers, i)) {
                 try {
@@ -164,7 +161,7 @@ TraceKit.report = (function reportModuleWrapper() {
             stack = lastExceptionStack;
             lastExceptionStack = null;
             lastException = null;
-        } else {
+        } else if (TraceKit.collectWindowErrors) {
             var location = {
                 'url': url,
                 'line': lineNo
@@ -180,7 +177,7 @@ TraceKit.report = (function reportModuleWrapper() {
             };
         }
 
-        notifyHandlers(stack, 'from window.onerror');
+        notifyHandlers(stack);
 
         if (_oldOnerrorHandler) {
             return _oldOnerrorHandler.apply(this, arguments);
@@ -212,7 +209,7 @@ TraceKit.report = (function reportModuleWrapper() {
                 var s = lastExceptionStack;
                 lastExceptionStack = null;
                 lastException = null;
-                notifyHandlers.apply(null, [s, null].concat(args));
+                notifyHandlers.apply(null, [s].concat(args));
             }
         }
 
@@ -228,7 +225,7 @@ TraceKit.report = (function reportModuleWrapper() {
             if (lastException === ex) {
                 lastExceptionStack = null;
                 lastException = null;
-                notifyHandlers.apply(null, [stack, null].concat(args));
+                notifyHandlers.apply(null, [stack].concat(args));
             }
         }, (stack.incomplete ? 2000 : 0));
 
