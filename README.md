@@ -1,7 +1,7 @@
 TraceKit - Cross browser stack traces.
 =====================================
 
-[![Build Status](https://travis-ci.org/occ/TraceKit.png?branch=master)](https://travis-ci.org/occ/TraceKit)
+[![Build Status](https://travis-ci.org/rollbar/TraceKit.png?branch=master)](https://travis-ci.org/rollbar/TraceKit)
 
 ### Supports all major browsers, from IE6 to Opera, the Andriod webview and everywhere in between.
 
