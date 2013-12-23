@@ -4,25 +4,12 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        'closureCompiler': {
-            options: {
-                compilerFile: './closure/compiler.jar',
-                checkModified: true,
-                compilerOpts: {
-                    compilation_level: 'ADVANCED_OPTIMIZATIONS',
-                    warning_level: 'verbose',
-                    jscomp_off: ['checkTypes', 'fileoverviewTags'],
-                    summary_detail_level: 3,
-                    output_wrapper: '"(function(){%output%}).call(this);"'
-                },
-                execOpts: {
-                    maxBuffer: 200 * 1024
+        pkg: grunt.file.readJSON('package.json'),
+        uglify: {
+            dist: {
+                files: {
+                    'dist/<%= pkg.name.toLowerCase() %>.min.js': 'dist/<%= pkg.name.toLowerCase() %>.js'
                 }
-
-            },
-            'compile': {
-                src: './tracekit.js',
-                dest: './tracekit.min.js'
             }
         },
         jshint: {
@@ -59,14 +46,26 @@ module.exports = function (grunt) {
                 ActiveXObject: false
             },
             lint: {
-                src: ['grunt.js', 'tracekit.js']
+                src: './dist/<%= pkg.name.toLowerCase() %>.js'
+            }
+        },
+        concat: {
+            options: {
+                banner: '(function(window, document){\n',
+                footer: '})(window, document);'
+            },
+            dist: {
+                files: {
+                    'dist/<%= pkg.name.toLowerCase() %>.js': ['src/helpers.js', 'src/trace.js', 'src/report.js'],
+                }
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-closure-tools');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-concat');
 
-    grunt.registerTask('default', ['jshint:lint', 'closureCompiler:compile']);
-    grunt.registerTask('travis', ['jshint:lint', 'closureCompiler:compile']);
+    grunt.registerTask('default', ['concat', 'jshint:lint', 'uglify']);
+    grunt.registerTask('travis', ['concat', 'jshint:lint', 'uglify']);
 };
