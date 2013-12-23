@@ -1,3 +1,8 @@
+
+function _isUndefined(what) {
+    return typeof what === 'undefined';
+}
+
 var UNKNOWN_FUNCTION = '?';
 function computeStackTraceWrapper(options) {
     var debug = false,
@@ -42,7 +47,7 @@ function computeStackTraceWrapper(options) {
      * @return {Array.<string>} Source contents.
      */
     function getSource(url) {
-        if (!_has(sourceCache, url)) {
+        if (!sourceCache.hasOwnProperty(url)) {
             // URL needs to be able to fetched within the acceptable domain.  Otherwise,
             // cross-domain errors will be triggered.
             var source = '';
@@ -470,7 +475,7 @@ function computeStackTraceWrapper(options) {
             source;
 
         for (i in scripts) {
-            if (_has(scripts, i) && !scripts[i].src) {
+            if (scripts.hasOwnProperty(i) && !scripts[i].src) {
                 inlineScriptBlocks.push(scripts[i]);
             }
         }

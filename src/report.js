@@ -19,11 +19,6 @@ function _has(object, key) {
 }
 
 
-function _isUndefined(what) {
-    return typeof what === 'undefined';
-}
-
-
 var TraceKit = {};
 var _oldTraceKit = window.TraceKit;
 
