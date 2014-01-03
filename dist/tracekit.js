@@ -17,7 +17,7 @@ var Helpers = {
           var originalFn = window[fnName];
           window[fnName] = function traceKitAsyncExtension() {
               // Make a copy of the arguments
-              var args = arguments.slice();
+              var args = Array.prototype.slice.call(arguments, 0);
               var originalCallback = args[0];
               if (typeof (originalCallback) === 'function') {
                   args[0] = Helpers.wrap(originalCallback, callback);
