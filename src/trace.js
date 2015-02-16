@@ -660,13 +660,19 @@ function computeStackTraceWrapper(options) {
                 funcs['' + curr] = true;
             }
 
-            stack.push(item);
+            if (item.func && item.line) {
+              stack.push(item);
+            }
         }
 
         if (depth) {
             // console.log('depth is ' + depth);
             // console.log('stack is ' + stack.length);
             stack.splice(0, depth);
+        }
+
+        if (!stack.length) {
+          return null;
         }
 
         var result = {
@@ -677,8 +683,31 @@ function computeStackTraceWrapper(options) {
             'stack': stack,
             'useragent': navigator.userAgent
         };
+
         augmentStackTraceWithInitialElement(result, ex.sourceURL || ex.fileName, ex.line || ex.lineNumber, ex.message || ex.description);
+
         return result;
+    }
+
+    function computeStackTraceByRawStack(ex) {
+      var funcValue = ex.stack || ex.stacktrace || ex.message;
+      var serializedFuncValue = (typeof funcValue === 'string') ? funcValue : JSON.stringify(funcValue);
+      var item = {
+        'url': null,
+        'func': serializedFuncValue,
+        'line': null,
+        'column': null
+      };
+      var stack = [item];
+
+      return {
+        'mode': 'raw',
+        'name': ex.name,
+        'message': ex.message,
+        'url': document.location.href,
+        'stack': stack,
+        'useragent': navigator.userAgent
+      };
     }
 
     /**
@@ -735,6 +764,17 @@ function computeStackTraceWrapper(options) {
             if (debug) {
                 throw e;
             }
+        }
+
+        try {
+          stack = computeStackTraceByRawStack(ex);
+          if (stack) {
+              return stack;
+          }
+        } catch (e) {
+          if (debug) {
+              throw e;
+          }
         }
 
         return {
